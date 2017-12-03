@@ -5,7 +5,7 @@
  * \defgroup platform_sleep Sleep functions
  * @{
  */
- 
+
 /* mbed Microcontroller Library
  * Copyright (c) 2006-2017 ARM Limited
  *
@@ -110,7 +110,6 @@ void sleep_manager_sleep_auto(void);
  *
  * @note This function can be a noop if not implemented by the platform.
  * @note This function will be a noop in debug mode (debug build profile when MBED_DEBUG is defined).
- * @note This function will be a noop while uVisor is in use.
  * @note This function will be a noop if the following conditions are met:
  *   - The RTOS is present
  *   - The processor turn off the Systick clock during sleep
@@ -130,20 +129,17 @@ void sleep_manager_sleep_auto(void);
  */
 __INLINE static void sleep(void)
 {
-#if !(defined(FEATURE_UVISOR) && defined(TARGET_UVISOR_SUPPORTED))
 #if DEVICE_SLEEP
 #if (MBED_CONF_RTOS_PRESENT == 0) || (DEVICE_STCLK_OFF_DURING_SLEEP == 0) || defined(MBED_TICKLESS)
     sleep_manager_sleep_auto();
 #endif /* (MBED_CONF_RTOS_PRESENT == 0) || (DEVICE_STCLK_OFF_DURING_SLEEP == 0) || defined(MBED_TICKLESS) */
 #endif /* DEVICE_SLEEP */
-#endif /* !(defined(FEATURE_UVISOR) && defined(TARGET_UVISOR_SUPPORTED)) */
 }
 
 /** Send the microcontroller to deep sleep
  *
  * @note This function can be a noop if not implemented by the platform.
  * @note This function will be a noop in debug mode (debug build profile when MBED_DEBUG is defined)
- * @note This function will be a noop while uVisor is in use.
  *
  * This processor is setup ready for deep sleep, and sent to sleep. This mode
  * has the same sleep features as sleep plus it powers down peripherals and clocks. All state
@@ -160,11 +156,9 @@ __INLINE static void sleep(void)
 MBED_DEPRECATED_SINCE("mbed-os-5.6", "One entry point for an application, use sleep()")
 __INLINE static void deepsleep(void)
 {
-#if !(defined(FEATURE_UVISOR) && defined(TARGET_UVISOR_SUPPORTED))
 #if DEVICE_SLEEP
     sleep_manager_sleep_auto();
 #endif /* DEVICE_SLEEP */
-#endif /* !(defined(FEATURE_UVISOR) && defined(TARGET_UVISOR_SUPPORTED)) */
 }
 
 #ifdef __cplusplus

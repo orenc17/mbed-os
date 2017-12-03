@@ -36,24 +36,12 @@
 #include "Driver_Common.h"
 #endif /* CFSTORE_CONFIG_BACKEND_FLASH_ENABLED */
 
-#ifdef YOTTA_CFG_CFSTORE_UVISOR
-#include "uvisor-lib/uvisor-lib.h"
-#endif /* YOTTA_CFG_CFSTORE_UVISOR */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 
 using namespace utest::v1;
-
-/* Configure secure box. */
-#ifdef YOTTA_CFG_CFSTORE_UVISOR
-UVISOR_BOX_NAMESPACE("com.arm.mbed.cfstore.test.flash.box1");
-UVISOR_BOX_CONFIG(cfstore_flash_box1, UVISOR_BOX_STACK_SIZE);
-#endif /* YOTTA_CFG_CFSTORE_UVISOR */
-
-
 
 /* shared code common to both sync and async test cases */
 

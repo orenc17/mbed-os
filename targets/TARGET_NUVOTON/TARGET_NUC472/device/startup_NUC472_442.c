@@ -62,7 +62,6 @@ extern uint32_t __bss_end__;
 extern uint32_t __bss_extern_start__  WEAK;
 extern uint32_t __bss_extern_end__ WEAK;
 
-extern void uvisor_init(void);
 #if defined(TOOLCHAIN_GCC_ARM)
 extern void _start(void);
 #else
@@ -90,11 +89,11 @@ WEAK_ALIAS_FUNC(SysTick_Handler, Default_Handler)
 /* Peripherals handlers */
 WEAK_ALIAS_FUNC(BOD_IRQHandler, Default_Handler)        // 0: Brown Out detection
 WEAK_ALIAS_FUNC(IRC_IRQHandler, Default_Handler)        // 1: Internal RC
-WEAK_ALIAS_FUNC(PWRWU_IRQHandler, Default_Handler)      // 2: Power Down Wake Up 
+WEAK_ALIAS_FUNC(PWRWU_IRQHandler, Default_Handler)      // 2: Power Down Wake Up
 WEAK_ALIAS_FUNC(SRAMF_IRQHandler, Default_Handler)      // 3: Reserved.
 WEAK_ALIAS_FUNC(CLKF_IRQHandler, Default_Handler)       // 4: CLKF
                                                         // 5: Reserved.
-WEAK_ALIAS_FUNC(RTC_IRQHandler, Default_Handler)        // 6: Real Time Clock 
+WEAK_ALIAS_FUNC(RTC_IRQHandler, Default_Handler)        // 6: Real Time Clock
 WEAK_ALIAS_FUNC(TAMPER_IRQHandler, Default_Handler)     // 7: Tamper detection
 WEAK_ALIAS_FUNC(EINT0_IRQHandler, Default_Handler)      // 8: External Input 0
 WEAK_ALIAS_FUNC(EINT1_IRQHandler, Default_Handler)      // 9: External Input 1
@@ -103,7 +102,7 @@ WEAK_ALIAS_FUNC(EINT3_IRQHandler, Default_Handler)      // 11: External Input 3
 WEAK_ALIAS_FUNC(EINT4_IRQHandler, Default_Handler)      // 12: External Input 4
 WEAK_ALIAS_FUNC(EINT5_IRQHandler, Default_Handler)      // 13: External Input 5
 WEAK_ALIAS_FUNC(EINT6_IRQHandler, Default_Handler)      // 14: External Input 6
-WEAK_ALIAS_FUNC(EINT7_IRQHandler, Default_Handler)      // 15: External Input 7 
+WEAK_ALIAS_FUNC(EINT7_IRQHandler, Default_Handler)      // 15: External Input 7
 WEAK_ALIAS_FUNC(GPA_IRQHandler, Default_Handler)        // 16: GPIO Port A
 WEAK_ALIAS_FUNC(GPB_IRQHandler, Default_Handler)        // 17: GPIO Port B
 WEAK_ALIAS_FUNC(GPC_IRQHandler, Default_Handler)        // 18: GPIO Port C
@@ -272,11 +271,11 @@ const uint32_t __vector_handlers[] = {
     /* External Interrupts */
     (uint32_t) BOD_IRQHandler,          // 0: Brown Out detection
     (uint32_t) IRC_IRQHandler,          // 1: Internal RC
-    (uint32_t) PWRWU_IRQHandler,        // 2: Power Down Wake Up 
+    (uint32_t) PWRWU_IRQHandler,        // 2: Power Down Wake Up
     (uint32_t) SRAMF_IRQHandler,        // 3: Reserved.
     (uint32_t) CLKF_IRQHandler,         // 4: CLKF
     (uint32_t) Default_Handler,         // 5: Reserved.
-    (uint32_t) RTC_IRQHandler,          // 6: Real Time Clock 
+    (uint32_t) RTC_IRQHandler,          // 6: Real Time Clock
     (uint32_t) TAMPER_IRQHandler,       // 7: Tamper detection
     (uint32_t) EINT0_IRQHandler,        // 8: External Input 0
     (uint32_t) EINT1_IRQHandler,        // 9: External Input 1
@@ -285,7 +284,7 @@ const uint32_t __vector_handlers[] = {
     (uint32_t) EINT4_IRQHandler,        // 12: External Input 4
     (uint32_t) EINT5_IRQHandler,        // 13: External Input 5
     (uint32_t) EINT6_IRQHandler,        // 14: External Input 6
-    (uint32_t) EINT7_IRQHandler,        // 15: External Input 7 
+    (uint32_t) EINT7_IRQHandler,        // 15: External Input 7
     (uint32_t) GPA_IRQHandler,          // 16: GPIO Port A
     (uint32_t) GPB_IRQHandler,          // 17: GPIO Port B
     (uint32_t) GPC_IRQHandler,          // 18: GPIO Port C
@@ -411,7 +410,7 @@ const uint32_t __vector_handlers[] = {
     (uint32_t) PS2D_IRQHandler,         // 138: PS/2 device
     (uint32_t) CAP_IRQHandler,          // 139: VIN
     (uint32_t) CRYPTO_IRQHandler,       // 140: CRYPTO
-    (uint32_t) CRC_IRQHandler,          // 141: CRC    
+    (uint32_t) CRC_IRQHandler,          // 141: CRC
 };
 
 /**
@@ -421,27 +420,27 @@ void Reset_Handler(void)
 {
     /* Disable register write-protection function */
     SYS_UnlockReg();
-    
+
     /* Disable branch buffer if VCID is 0 */
     if (SYS->VCID == 0) {
         FMC->FTCTL |= 0x80;
     }
-    
+
     /* Disable Power-on Reset function */
     SYS_DISABLE_POR();
-    
+
     /**
      * NOTE 1: Unlock is required for perhaps some register access in SystemInit().
      * NOTE 2: Because EBI (external SRAM) init is done in SystemInit(), SystemInit() must be called at the very start.
      */
     SystemInit();
-    
+
     /* Enable register write-protection function */
     SYS_LockReg();
 
 #if defined(__CC_ARM) || (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))
     __main();
-    
+
 #elif defined(__ICCARM__)
     __iar_program_start();
 
@@ -449,14 +448,14 @@ void Reset_Handler(void)
     uint32_t *src_ind = (uint32_t *) &__etext;
     uint32_t *dst_ind = (uint32_t *) &__data_start__;
     uint32_t *dst_end = (uint32_t *) &__data_end__;
-    
+
     /* Move .data section from ROM to RAM */
     if (src_ind != dst_ind) {
         for (; dst_ind < dst_end;) {
             *dst_ind ++ = *src_ind ++;
         }
     }
-   
+
     /* Initialize .bss section to zero */
     dst_ind = (uint32_t *) &__bss_start__;
     dst_end = (uint32_t *) &__bss_end__;
@@ -465,7 +464,7 @@ void Reset_Handler(void)
             *dst_ind ++ = 0;
         }
     }
-    
+
     /* Initialize .bss.extern section to zero */
     dst_ind = (uint32_t *) &__bss_extern_start__;
     dst_end = (uint32_t *) &__bss_extern_end__;
@@ -474,9 +473,9 @@ void Reset_Handler(void)
             *dst_ind ++ = 0;
         }
     }
-    
+
     _start();
-    
+
 #endif
     /* Infinite loop */
     while (1);

@@ -37,10 +37,7 @@ void k66f_init_eth_hardware(void)
 {
     port_pin_config_t configENET = {0};
 
-#ifndef FEATURE_UVISOR
-    /* Disable MPU only when uVisor is not around. */
     SYSMPU->CESR &= ~SYSMPU_CESR_VLD_MASK;
-#endif/*FEATURE_UVISOR*/
 
     /* Ungate the port clock */
     CLOCK_EnableClock(kCLOCK_PortA);

@@ -5,18 +5,14 @@ LR_IROM1 0x00000000 {
    *(InRoot$$Sections)
    .ANY (+RO)
   }
-  
-  ;UVISOR AlignExpr(+0, 16) {  ; 16 byte-aligned
-  ;  uvisor-lib.a (+RW +ZI)
-  ;}
-  
+
   ARM_LIB_STACK 0x20000000 EMPTY 0x800 {
   }
-  
+
   RW_IRAM1 AlignExpr(+0, 16) {  ; 16 byte-aligned
    .ANY (+RW +ZI)
   }
-  
+
   ARM_LIB_HEAP AlignExpr(+0, 16) EMPTY (0x20000000 + 0x4000 - AlignExpr(ImageLimit(RW_IRAM1), 16)) {
   }
 }

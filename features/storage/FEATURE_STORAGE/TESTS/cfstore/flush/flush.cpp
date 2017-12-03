@@ -33,10 +33,6 @@
 #include "utest/utest.h"
 #include "unity/unity.h"
 #include "greentea-client/test_env.h"
-#ifdef YOTTA_CFG_CFSTORE_UVISOR
-#include "uvisor-lib/uvisor-lib.h"
-#include "cfstore_uvisor.h"
-#endif /* YOTTA_CFG_CFSTORE_UVISOR */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -88,9 +84,6 @@ int main()
 #include "utest/utest.h"
 #include "unity/unity.h"
 #include "greentea-client/test_env.h"
-#ifdef YOTTA_CFG_CFSTORE_UVISOR
-#include "uvisor-lib/uvisor-lib.h"
-#endif /* YOTTA_CFG_CFSTORE_UVISOR */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -121,15 +114,6 @@ using namespace utest::v1;
  *  buffer for storing TEST_ASSERT_xxx_MESSAGE messages
  */
 char cfstore_flush_utest_msg_g[CFSTORE_FLUSH_UTEST_MSG_BUF_SIZE];
-
-/* Configure secure box. */
-#ifdef YOTTA_CFG_CFSTORE_UVISOR
-UVISOR_BOX_NAMESPACE("com.arm.mbed.cfstore.test.flush.box1");
-UVISOR_BOX_CONFIG(cfstore_flush_box1, UVISOR_BOX_STACK_SIZE);
-#endif /* YOTTA_CFG_CFSTORE_UVISOR */
-
-
-
 
 #ifdef TARGET_LIKE_X86_LINUX_NATIVE
 

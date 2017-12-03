@@ -146,11 +146,6 @@ disable_watchdog:
 
   ldr   r0, =SystemInit
   blx   r0
-/* TODO -  Uncomment when uvisor support is added */
-/*
-  ldr   r0, =uvisor_init
-  blx   r0
-*/
   ldr   r0, =_start
   bx    r0
   .pool
@@ -182,7 +177,7 @@ disable_watchdog:
   def_default_handler    PendSV_Handler
   def_default_handler    SysTick_Handler
   def_default_handler    Default_Handler
-  
+
   .macro    def_irq_default_handler    handler_name
   .weak     \handler_name
   .set      \handler_name, Default_Handler
@@ -210,5 +205,5 @@ disable_watchdog:
   def_irq_default_handler     fIrqI2C2Handler
   def_irq_default_handler     fIrqFVDDHCompHandler
   def_irq_default_handler     DefaultISR
-  
+
   .end

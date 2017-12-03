@@ -63,7 +63,6 @@ extern uint32_t __data_end__;
 extern uint32_t __bss_start__;
 extern uint32_t __bss_end__;
 
-extern void uvisor_init(void);
 #if defined(TOOLCHAIN_GCC_ARM)
 extern void _start(void);
 #else
@@ -324,25 +323,25 @@ const uint32_t __vector_handlers[] = {
     (uint32_t) ETMC_IRQHandler,         // 95:
 };
 
-/* 
- * Reset_Handler: 
+/*
+ * Reset_Handler:
  *  Divert one small memory block for Initial Stack
  *  Continue Initial Stack for Reset_Handler_1
  *  Jump to Reset_Handler_1
- * 
+ *
  * Reset_Handler_1
  *  Enable SPIM CCM memory. From now on, this memory could be used for Initial Stack, depending on linker.
  *  Configure Initial Stack, using linker-generated symbols for Reset_Handler_2
  *  Jump to Reset_Handler_2
- * 
+ *
  * Reset_Handler_2
  *  C/C++ runtime initialization
  */
-     
+
 #if defined(__CC_ARM)
 
 __asm static void Reset_Handler(void)
-{    
+{
     LDR SP, =0x20000200
     LDR R0, =0x20000200
     LDR R1, =__cpp(Reset_Handler_1)
@@ -393,19 +392,19 @@ void Reset_Handler_1(void)
 {
     /* Disable register write-protection function */
     SYS_UnlockReg();
-    
+
     /* Disable Power-on Reset function */
     SYS_DISABLE_POR();
-    
+
     /**
      * NOTE 1: Some register accesses require unlock.
      * NOTE 2: Because EBI (external SRAM) init is done in SystemInit(), SystemInit() must be called at the very start.
      */
     SystemInit();
-    
+
     /* Enable register write-protection function */
     SYS_LockReg();
-    
+
 #if defined(__CC_ARM) || (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))
     Reset_Handler_Cascade((void *) &Image$$ARM_LIB_STACK$$ZI$$Limit, (void *) Reset_Handler_2);
 #elif defined(__ICCARM__)
@@ -417,21 +416,9 @@ void Reset_Handler_1(void)
 
 void Reset_Handler_2(void)
 {
-    /**
-     * The call to uvisor_init() happens independently of uVisor being enabled or
-     * not, so it is conditionally compiled only based on FEATURE_UVISOR.
-     *
-     * The call to uvisor_init() must be right after system initialization (usually called SystemInit()) and 
-     * right before the C/C++ library initialization (zeroing the BSS section, loading data from flash to SRAM). 
-     * Otherwise, we might get data corruption.
-     */
-#if defined(FEATURE_UVISOR)
-    uvisor_init();
-#endif
-
 #if defined(__CC_ARM) || (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))
     __main();
-    
+
 #elif defined(__ICCARM__)
     __iar_program_start();
 
@@ -446,7 +433,7 @@ void Reset_Handler_2(void)
             *dst_ind ++ = *src_ind ++;
         }
     }
-   
+
     /* Initialize .bss section to zero */
     dst_ind = (uint32_t *) &__bss_start__;
     dst_end = (uint32_t *) &__bss_end__;
@@ -455,9 +442,9 @@ void Reset_Handler_2(void)
             *dst_ind ++ = 0;
         }
     }
-    
+
     _start();
-    
+
 #endif
 
     /* Infinite loop */

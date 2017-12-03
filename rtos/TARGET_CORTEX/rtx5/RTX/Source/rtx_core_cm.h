@@ -61,7 +61,7 @@
        (__ARM_ARCH_8M_MAIN__ == 1U))
 #define IS_IRQ_MASKED()         ((__get_PRIMASK() != 0U) || (__get_BASEPRI() != 0U))
 #else
-#define IS_IRQ_MASKED()          (__get_PRIMASK() != 0U) 
+#define IS_IRQ_MASKED()          (__get_PRIMASK() != 0U)
 #endif
 
 #define xPSR_INIT(...)          0x01000000U
@@ -607,10 +607,7 @@ __STATIC_INLINE void SVC_Initialize (void) {
     n = p + 1U;
   }
 
-  /* Only change the SVCall priority if uVisor is not present. */
-  #if !(defined(FEATURE_UVISOR) && defined(TARGET_UVISOR_SUPPORTED))
   SCB->SHP[7] = (uint8_t)(0xFEU << n);
-  #endif
 #elif  (__ARM_ARCH_6M__      == 1U)
   uint32_t n;
 

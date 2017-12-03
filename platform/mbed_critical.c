@@ -64,15 +64,11 @@ MBED_WEAK void core_util_critical_section_enter(void)
     /* If the interrupt_enable_counter overflows or we are in a nested critical section and interrupts
        are enabled, then something has gone badly wrong thus assert an error.
     */
-    MBED_ASSERT(interrupt_enable_counter < UINT32_MAX); 
-// FIXME
-#ifndef   FEATURE_UVISOR
+    MBED_ASSERT(interrupt_enable_counter < UINT32_MAX);
     if (interrupt_enable_counter > 0) {
         MBED_ASSERT(interrupts_disabled);
     }
-#else
-#warning "core_util_critical_section_enter needs fixing to work from unprivileged code"
-#endif /* FEATURE_UVISOR */
+
     interrupt_enable_counter++;
 }
 
@@ -80,16 +76,8 @@ MBED_WEAK void core_util_critical_section_exit(void)
 {
     /* If critical_section_enter has not previously been called, do nothing */
     if (interrupt_enable_counter) {
-
-// FIXME
-#ifndef   FEATURE_UVISOR
         bool interrupts_disabled = !core_util_are_interrupts_enabled(); /* get the current interrupt disabled state */
-
         MBED_ASSERT(interrupts_disabled); /* Interrupts must be disabled on invoking an exit from a critical section */
-#else
-#warning "core_util_critical_section_exit needs fixing to work from unprivileged code"
-#endif /* FEATURE_UVISOR */
-
         interrupt_enable_counter--;
 
         /* Only re-enable interrupts if we are exiting the last of the nested critical sections and
@@ -104,7 +92,7 @@ MBED_WEAK void core_util_critical_section_exit(void)
 #if __EXCLUSIVE_ACCESS
 
 /* Supress __ldrex and __strex deprecated warnings - "#3731-D: intrinsic is deprecated" */
-#if defined (__CC_ARM) 
+#if defined (__CC_ARM)
 #pragma diag_suppress 3731
 #endif
 

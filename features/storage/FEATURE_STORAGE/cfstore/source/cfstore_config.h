@@ -27,8 +27,6 @@
  *
  * YOTTA_CFG_CFSTORE_BACKEND_SRAM
  *   build only for sram backend (no flash integration)
- * YOTTA_CFG_CFSTORE_UVISOR_ENABLE
- *   build with uvisor enable
  *
  * */
 

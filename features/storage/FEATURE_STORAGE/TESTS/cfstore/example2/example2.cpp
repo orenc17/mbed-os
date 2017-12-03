@@ -41,9 +41,6 @@
 #include "utest/utest.h"
 #include "unity/unity.h"
 #include "greentea-client/test_env.h"
-#ifdef YOTTA_CFG_CONFIG_UVISOR
-#include "uvisor-lib/uvisor-lib.h"
-#endif /* YOTTA_CFG_CONFIG_UVISOR */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -125,7 +122,7 @@ static control_t cfstore_example2_test_01(const size_t call_count)
 	ARM_CFSTORE_KEYDESC kdesc;
 	ARM_CFSTORE_SIZE valueLen;
 	char* ptr = NULL;
-	
+
 	const char key[]   = "com.arm.mbed.spv.assets.asset2.payload";
 	const char value[] = "Grumpy old man";
 
@@ -133,7 +130,7 @@ static control_t cfstore_example2_test_01(const size_t call_count)
 
 	// It must not exceed the value_len field specified when the Key-Value pair was created
 	const char newDataToWrite[] = "Grumpy man";
-	
+
 	char readBuf[CFSTORE_KEY_NAME_MAX_LENGTH + 1];
 	ARM_CFSTORE_SIZE len = 0;
 

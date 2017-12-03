@@ -8,13 +8,13 @@
 
 #if !defined(MBED_APP_SIZE)
   #define MBED_APP_SIZE 0x00080000
-#endif 
- 
+#endif
+
 StackSize = 0x800;
 
 MEMORY
 {
-    
+
   VECTORS (rx)          : ORIGIN = MBED_APP_START, LENGTH = 0x00000400
   FLASH (rx)            : ORIGIN = MBED_APP_START + 0x400, LENGTH = MBED_APP_SIZE - 0x00000400
   RAM_INTERN (rwx)      : ORIGIN = 0x20000000, LENGTH = 0x00010000 - 0x00000000
@@ -24,7 +24,7 @@ MEMORY
  * Must match cmsis_nvic.h
  */
 __vector_size = 4 * (16 + 142);
- 
+
 /* Linker script to place sections and symbol values. Should be used together
  * with other linker script that defines memory regions FLASH and RAM.
  * It references following symbols, which must be defined in code:
@@ -62,39 +62,10 @@ SECTIONS
          . = ALIGN(4);
     } > VECTORS
 
-    /* ensure that uvisor bss is at the beginning of memory */
-    .uvisor.bss (NOLOAD):
-    {
-        . = ALIGN(32);
-        __uvisor_bss_start = .;
 
-        /* protected uvisor main bss */
-        . = ALIGN(32);
-        __uvisor_bss_main_start = .;
-        KEEP(*(.keep.uvisor.bss.main))
-        . = ALIGN(32);
-        __uvisor_bss_main_end = .;
-
-        /* protected uvisor secure boxes bss */
-        . = ALIGN(32);
-        __uvisor_bss_boxes_start = .;
-        KEEP(*(.keep.uvisor.bss.boxes))
-        . = ALIGN(32);
-        __uvisor_bss_boxes_end = .;
-
-        /* Ensure log2(size) alignment of the uvisor region, to ensure that the region can be effectively protected by the MPU. */
-        . = ALIGN(1 << LOG2CEIL(__uvisor_bss_boxes_end - __uvisor_bss_start));
-        __uvisor_bss_end = .;
-    } > RAM_INTERN
 
     .text :
     {
-        /* uVisor code and data */
-        . = ALIGN(4);
-        __uvisor_main_start = .;
-        *(.uvisor.main)
-        __uvisor_main_end = .;
-
         *(.text*)
 
         KEEP(*(.init))
@@ -156,7 +127,7 @@ SECTIONS
         . += __vector_size;
         PROVIDE(__end_vector_table__ = .);
     } > RAM_INTERN
-    
+
     .data :
     {
         PROVIDE( __etext = LOADADDR(.data) );
@@ -191,40 +162,6 @@ SECTIONS
 
     } >RAM_INTERN AT>FLASH
 
-    /* uvisor configuration data */
-    .uvisor.secure :
-    {
-        . = ALIGN(32);
-        __uvisor_secure_start = .;
-
-        /* uvisor secure boxes configuration tables */
-        . = ALIGN(32);
-        __uvisor_cfgtbl_start = .;
-        KEEP(*(.keep.uvisor.cfgtbl))
-        . = ALIGN(32);
-        __uvisor_cfgtbl_end = .;
-
-        /* pointers to uvisor secure boxes configuration tables */
-        /* note: no further alignment here, we need to have the exact list of pointers */
-        __uvisor_cfgtbl_ptr_start = .;
-        KEEP(*(.keep.uvisor.cfgtbl_ptr_first))
-        KEEP(*(.keep.uvisor.cfgtbl_ptr))
-        __uvisor_cfgtbl_ptr_end = .;
-
-        /* the following symbols are kept for backward compatibility and will be soon
-         * deprecated; applications actively using uVisor (__uvisor_mode == UVISOR_ENABLED)
-         * will need to use uVisor 0.8.x or above, or the security assertions will halt the
-         * system */
-        /************************/
-        __uvisor_data_src = .;
-        __uvisor_data_start = .;
-        __uvisor_data_end = .;
-        /************************/
-
-        . = ALIGN(32);
-        __uvisor_secure_end = .;
-    } >FLASH
-
     .uninitialized (NOLOAD):
     {
         . = ALIGN(32);
@@ -247,7 +184,7 @@ SECTIONS
         *mesh_system.o(.bss*)
        __bss_extern_end__ = .;
     } > RAM_INTERN
-    
+
     .bss (NOLOAD):
     {
         __bss_start__ = .;
@@ -267,10 +204,4 @@ SECTIONS
     PROVIDE(__heap_size = SIZEOF(.heap));
     PROVIDE(__mbed_sbrk_start = ADDR(.heap));
     PROVIDE(__mbed_krbs_start = ADDR(.heap) + SIZEOF(.heap));
-    
-    /* Provide physical memory boundaries for uVisor. */
-    __uvisor_flash_start = ORIGIN(VECTORS);
-    __uvisor_flash_end = ORIGIN(FLASH) + LENGTH(FLASH);
-    __uvisor_sram_start = ORIGIN(RAM_INTERN);
-    __uvisor_sram_end = ORIGIN(RAM_INTERN) + LENGTH(RAM_INTERN);
 }

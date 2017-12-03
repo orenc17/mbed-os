@@ -422,10 +422,6 @@ class mbedToolchain:
         # Print output buffer
         self.output = str()
 
-        # uVisor spepcific rules
-        if 'UVISOR' in self.target.features and 'UVISOR_SUPPORTED' in self.target.extra_labels:
-            self.target.core = re.sub(r"F$", '', self.target.core)
-
         # Stats cache is used to reduce the amount of IO requests to stat
         # header files during dependency change. See need_update()
         self.stat_cache = {}

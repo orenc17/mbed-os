@@ -60,7 +60,6 @@ extern uint32_t __data_end__;
 extern uint32_t __bss_start__;
 extern uint32_t __bss_end__;
 
-extern void uvisor_init(void);
 #if defined(TOOLCHAIN_GCC_ARM)
 extern void _start(void);
 #else
@@ -88,11 +87,11 @@ WEAK_ALIAS_FUNC(SysTick_Handler, Default_Handler)
 /* Peripherals handlers */
 WEAK_ALIAS_FUNC(BOD_IRQHandler, Default_Handler)        // 0: Brown Out detection
 WEAK_ALIAS_FUNC(IRC_IRQHandler, Default_Handler)        // 1: Internal RC
-WEAK_ALIAS_FUNC(PWRWU_IRQHandler, Default_Handler)      // 2: Power down wake up 
+WEAK_ALIAS_FUNC(PWRWU_IRQHandler, Default_Handler)      // 2: Power down wake up
 WEAK_ALIAS_FUNC(RAMPE_IRQHandler, Default_Handler)      // 3: RAM parity error
 WEAK_ALIAS_FUNC(CLKFAIL_IRQHandler, Default_Handler)    // 4: Clock detection fail
                                                         // 5: Reserved
-WEAK_ALIAS_FUNC(RTC_IRQHandler, Default_Handler)        // 6: Real Time Clock 
+WEAK_ALIAS_FUNC(RTC_IRQHandler, Default_Handler)        // 6: Real Time Clock
 WEAK_ALIAS_FUNC(TAMPER_IRQHandler, Default_Handler)     // 7: Tamper detection
 WEAK_ALIAS_FUNC(WDT_IRQHandler, Default_Handler)        // 8: Watchdog timer
 WEAK_ALIAS_FUNC(WWDT_IRQHandler, Default_Handler)       // 9: Window watchdog timer
@@ -110,14 +109,14 @@ WEAK_ALIAS_FUNC(GPE_IRQHandler, Default_Handler)        // 20: GPIO Port E
 WEAK_ALIAS_FUNC(GPF_IRQHandler, Default_Handler)        // 21: GPIO Port F
 WEAK_ALIAS_FUNC(SPI0_IRQHandler, Default_Handler)       // 22: SPI0
 WEAK_ALIAS_FUNC(SPI1_IRQHandler, Default_Handler)       // 23: SPI1
-WEAK_ALIAS_FUNC(BRAKE0_IRQHandler, Default_Handler)     // 24: 
-WEAK_ALIAS_FUNC(PWM0P0_IRQHandler, Default_Handler)     // 25: 
-WEAK_ALIAS_FUNC(PWM0P1_IRQHandler, Default_Handler)     // 26: 
-WEAK_ALIAS_FUNC(PWM0P2_IRQHandler, Default_Handler)     // 27: 
-WEAK_ALIAS_FUNC(BRAKE1_IRQHandler, Default_Handler)     // 28: 
-WEAK_ALIAS_FUNC(PWM1P0_IRQHandler, Default_Handler)     // 29: 
-WEAK_ALIAS_FUNC(PWM1P1_IRQHandler, Default_Handler)     // 30: 
-WEAK_ALIAS_FUNC(PWM1P2_IRQHandler, Default_Handler)     // 31: 
+WEAK_ALIAS_FUNC(BRAKE0_IRQHandler, Default_Handler)     // 24:
+WEAK_ALIAS_FUNC(PWM0P0_IRQHandler, Default_Handler)     // 25:
+WEAK_ALIAS_FUNC(PWM0P1_IRQHandler, Default_Handler)     // 26:
+WEAK_ALIAS_FUNC(PWM0P2_IRQHandler, Default_Handler)     // 27:
+WEAK_ALIAS_FUNC(BRAKE1_IRQHandler, Default_Handler)     // 28:
+WEAK_ALIAS_FUNC(PWM1P0_IRQHandler, Default_Handler)     // 29:
+WEAK_ALIAS_FUNC(PWM1P1_IRQHandler, Default_Handler)     // 30:
+WEAK_ALIAS_FUNC(PWM1P2_IRQHandler, Default_Handler)     // 31:
 WEAK_ALIAS_FUNC(TMR0_IRQHandler, Default_Handler)       // 32: Timer 0
 WEAK_ALIAS_FUNC(TMR1_IRQHandler, Default_Handler)       // 33: Timer 1
 WEAK_ALIAS_FUNC(TMR2_IRQHandler, Default_Handler)       // 34: Timer 2
@@ -144,10 +143,10 @@ WEAK_ALIAS_FUNC(USBH_IRQHandler, Default_Handler)       // 54: USB host
 WEAK_ALIAS_FUNC(USBOTG_IRQHandler, Default_Handler)     // 55: USB OTG
 WEAK_ALIAS_FUNC(CAN0_IRQHandler, Default_Handler)       // 56: CAN0
                                                         // 57: Reserved
-WEAK_ALIAS_FUNC(SC0_IRQHandler, Default_Handler)        // 58: 
+WEAK_ALIAS_FUNC(SC0_IRQHandler, Default_Handler)        // 58:
                                                         // 59: Reserved.
-                                                        // 60: 
-                                                        // 61: 
+                                                        // 60:
+                                                        // 61:
                                                         // 62:
 WEAK_ALIAS_FUNC(TK_IRQHandler, Default_Handler)         // 63:
 
@@ -192,11 +191,11 @@ const uint32_t __vector_handlers[] = {
     /* External Interrupts */
     (uint32_t) BOD_IRQHandler,          // 0: Brown Out detection
     (uint32_t) IRC_IRQHandler,          // 1: Internal RC
-    (uint32_t) PWRWU_IRQHandler,        // 2: Power down wake up 
+    (uint32_t) PWRWU_IRQHandler,        // 2: Power down wake up
     (uint32_t) RAMPE_IRQHandler,        // 3: RAM parity error
     (uint32_t) CLKFAIL_IRQHandler,      // 4: Clock detection fail
     (uint32_t) Default_Handler,         // 5: Reserved
-    (uint32_t) RTC_IRQHandler,          // 6: Real Time Clock 
+    (uint32_t) RTC_IRQHandler,          // 6: Real Time Clock
     (uint32_t) TAMPER_IRQHandler,       // 7: Tamper detection
     (uint32_t) WDT_IRQHandler,          // 8: Watchdog timer
     (uint32_t) WWDT_IRQHandler,         // 9: Window watchdog timer
@@ -214,14 +213,14 @@ const uint32_t __vector_handlers[] = {
     (uint32_t) GPF_IRQHandler,          // 21: GPIO Port F
     (uint32_t) SPI0_IRQHandler,         // 22: SPI0
     (uint32_t) SPI1_IRQHandler,         // 23: SPI1
-    (uint32_t) BRAKE0_IRQHandler,       // 24: 
-    (uint32_t) PWM0P0_IRQHandler,       // 25: 
-    (uint32_t) PWM0P1_IRQHandler,       // 26: 
-    (uint32_t) PWM0P2_IRQHandler,       // 27: 
-    (uint32_t) BRAKE1_IRQHandler,       // 28: 
-    (uint32_t) PWM1P0_IRQHandler,       // 29: 
-    (uint32_t) PWM1P1_IRQHandler,       // 30: 
-    (uint32_t) PWM1P2_IRQHandler,       // 31: 
+    (uint32_t) BRAKE0_IRQHandler,       // 24:
+    (uint32_t) PWM0P0_IRQHandler,       // 25:
+    (uint32_t) PWM0P1_IRQHandler,       // 26:
+    (uint32_t) PWM0P2_IRQHandler,       // 27:
+    (uint32_t) BRAKE1_IRQHandler,       // 28:
+    (uint32_t) PWM1P0_IRQHandler,       // 29:
+    (uint32_t) PWM1P1_IRQHandler,       // 30:
+    (uint32_t) PWM1P2_IRQHandler,       // 31:
     (uint32_t) TMR0_IRQHandler,         // 32: Timer 0
     (uint32_t) TMR1_IRQHandler,         // 33: Timer 1
     (uint32_t) TMR2_IRQHandler,         // 34: Timer 2
@@ -248,10 +247,10 @@ const uint32_t __vector_handlers[] = {
     (uint32_t) USBOTG_IRQHandler,       // 55: USB OTG
     (uint32_t) CAN0_IRQHandler,         // 56: CAN0
     (uint32_t) Default_Handler,         // 57: Reserved
-    (uint32_t) SC0_IRQHandler,          // 58: 
+    (uint32_t) SC0_IRQHandler,          // 58:
     (uint32_t) Default_Handler,         // 59: Reserved.
-    (uint32_t) Default_Handler,         // 60: 
-    (uint32_t) Default_Handler,         // 61: 
+    (uint32_t) Default_Handler,         // 60:
+    (uint32_t) Default_Handler,         // 61:
     (uint32_t) Default_Handler,         // 62:
     (uint32_t) TK_IRQHandler,           // 63:
 };
@@ -263,25 +262,25 @@ void Reset_Handler(void)
 {
     /* Disable register write-protection function */
     SYS_UnlockReg();
-    
+
     /* Disable Power-on Reset function */
     SYS_DISABLE_POR();
-    
+
     /* HXT Crystal Type Select: INV */
     CLK->PWRCTL &= ~CLK_PWRCTL_HXTSELTYP_Msk;
-    
+
     /**
      * NOTE 1: Unlock is required for perhaps some register access in SystemInit().
      * NOTE 2: Because EBI (external SRAM) init is done in SystemInit(), SystemInit() must be called at the very start.
      */
     SystemInit();
-    
+
     /* Enable register write-protection function */
     SYS_LockReg();
 
 #if defined(__CC_ARM) || (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))
     __main();
-    
+
 #elif defined(__ICCARM__)
     __iar_program_start();
 
@@ -296,7 +295,7 @@ void Reset_Handler(void)
             *dst_ind ++ = *src_ind ++;
         }
     }
-   
+
     /* Initialize .bss section to zero */
     dst_ind = (uint32_t *) &__bss_start__;
     dst_end = (uint32_t *) &__bss_end__;
@@ -305,9 +304,9 @@ void Reset_Handler(void)
             *dst_ind ++ = 0;
         }
     }
-    
+
     _start();
-    
+
 #endif
 
     /* Infinite loop */
