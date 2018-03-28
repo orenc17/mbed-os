@@ -202,6 +202,10 @@ size_t psa_read(psa_handle_t msg_handle, uint32_t iovec_idx, void *buf, size_t n
 
 void psa_write(psa_handle_t msg_handle, uint32_t outvec_idx, const void *buffer, size_t num_bytes)
 {
+    if (0 == num_bytes) {
+        return;
+    }
+
     if (!is_buffer_accessible(buffer, num_bytes)) {
         SPM_PANIC("buffer is inaccessible\n");
     }
@@ -228,11 +232,9 @@ void psa_write(psa_handle_t msg_handle, uint32_t outvec_idx, const void *buffer,
         SPM_PANIC("buffer is inaccessible\n");
     }
 
-    if (num_bytes > 0) {
-        memcpy((uint8_t *)(active_iovec->base), buffer, num_bytes);
-        active_iovec->base = (void *)((uint8_t*)active_iovec->base + num_bytes);
-        active_iovec->len -= num_bytes;
-    }
+    memcpy((uint8_t *)(active_iovec->base), buffer, num_bytes);
+    active_iovec->base = (void *)((uint8_t*)active_iovec->base + num_bytes);
+    active_iovec->len -= num_bytes;
 
     return;
 }
