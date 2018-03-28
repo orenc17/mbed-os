@@ -221,7 +221,7 @@ void psa_write(psa_handle_t msg_handle, uint32_t outvec_idx, const void *buffer,
     psa_outvec_t *active_iovec = &active_msg->out_vec[outvec_idx];
 
     if (num_bytes > active_iovec->len) {
-        num_bytes = active_iovec->len;
+        SPM_PANIC("Invalid write operation (overflow by %d)\n", num_bytes - active_iovec->len);
     }
 
     if (!is_buffer_accessible(active_iovec->base, num_bytes)) {
