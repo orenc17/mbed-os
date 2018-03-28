@@ -159,11 +159,11 @@ void psa_get(psa_signal_t signum, psa_msg_t *msg)
     msg->rhandle = active_msg->channel->rhandle;
 
     for (size_t i = 0; i < PSA_MAX_INVEC_LEN; i++) {
-        msg->in_size[i] = active_msg->in_vec[i].iov_len;
+        msg->in_size[i] = active_msg->in_vec[i].len;
     }
 
     for (size_t i = 0; i < PSA_MAX_OUTVEC_LEN; i++) {
-        msg->out_size[i] = active_msg->out_vec[i].iov_len;
+        msg->out_size[i] = active_msg->out_vec[i].len;
     }
 }
 
@@ -185,16 +185,16 @@ size_t psa_read(psa_handle_t msg_handle, uint32_t iovec_idx, void *buf, size_t n
 
     PARTITION_STATE_ASSERT(active_msg->channel->dst_sec_func->partition, PARTITION_STATE_ACTIVE);
 
-    iovec_t *active_iovec = &active_msg->in_vec[iovec_idx];
+    psa_invec_t *active_iovec = &active_msg->in_vec[iovec_idx];
 
-    if (num_bytes > active_iovec->iov_len) {
-        num_bytes = active_iovec->iov_len;
+    if (num_bytes > active_iovec->len) {
+        num_bytes = active_iovec->len;
     }
 
     if (num_bytes > 0) {
-        memcpy(buf, active_iovec->iov_base, num_bytes);
-        active_iovec->iov_base = (void *)((uint8_t*)active_iovec->iov_base + num_bytes);
-        active_iovec->iov_len -= num_bytes;
+        memcpy(buf, active_iovec->base, num_bytes);
+        active_iovec->base = (void *)((uint8_t*)active_iovec->base + num_bytes);
+        active_iovec->len -= num_bytes;
     }
 
     return num_bytes;
@@ -218,20 +218,20 @@ void psa_write(psa_handle_t msg_handle, uint32_t outvec_idx, const void *buffer,
 
     PARTITION_STATE_ASSERT(active_msg->channel->dst_sec_func->partition, PARTITION_STATE_ACTIVE);
 
-    iovec_t *active_iovec = &active_msg->out_vec[outvec_idx];
+    psa_outvec_t *active_iovec = &active_msg->out_vec[outvec_idx];
 
-    if (num_bytes > active_iovec->iov_len) {
-        num_bytes = active_iovec->iov_len;
+    if (num_bytes > active_iovec->len) {
+        num_bytes = active_iovec->len;
     }
 
-    if (!is_buffer_accessible(active_iovec->iov_base, num_bytes)) {
+    if (!is_buffer_accessible(active_iovec->base, num_bytes)) {
         SPM_PANIC("buffer is inaccessible\n");
     }
 
     if (num_bytes > 0) {
-        memcpy((uint8_t *)(active_iovec->iov_base), buffer, num_bytes);
-        active_iovec->iov_base = (void *)((uint8_t*)active_iovec->iov_base + num_bytes);
-        active_iovec->iov_len -= num_bytes;
+        memcpy((uint8_t *)(active_iovec->base), buffer, num_bytes);
+        active_iovec->base = (void *)((uint8_t*)active_iovec->base + num_bytes);
+        active_iovec->len -= num_bytes;
     }
 
     return;

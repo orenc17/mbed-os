@@ -62,9 +62,9 @@ static psa_handle_t negative_server_ipc_tests_connect(uint32_t sfid, uint32_t mi
 }
 
 static void negative_server_ipc_tests_call( psa_handle_t handle,
-                                   iovec_t *invec,
+                                   psa_invec_t *invec,
                                    size_t tx_len,
-                                   iovec_t *outvec,
+                                   psa_outvec_t *outvec,
                                    size_t rx_len
                                  )
 {
@@ -147,10 +147,10 @@ void server_write_null_buffer()
     handle = negative_server_ipc_tests_connect(PART2_WRITE_BUFFER_NULL, MINOR_VER);
 
     uint8_t data[2] = {1, 0};
-    iovec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
+    psa_invec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};
-    iovec_t resp = { NULL, CLIENT_RSP_BUF_SIZE };
+    psa_outvec_t resp = { NULL, CLIENT_RSP_BUF_SIZE };
 
     negative_server_ipc_tests_call(handle, iovec_temp, PSA_MAX_INVEC_LEN, &resp, 1);
 
@@ -165,7 +165,7 @@ void server_write_rx_buff_null()
     handle = negative_server_ipc_tests_connect(PART2_WRITE_RX_BUFF_NULL, MINOR_VER);
 
     uint8_t data[2] = {1, 0};
-    iovec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
+    psa_invec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};
 
@@ -182,10 +182,10 @@ void server_write_invalid_handle()
     handle = negative_server_ipc_tests_connect(PART2_WRITE_INVALID_HANDLE, MINOR_VER);
 
     uint8_t data[2] = {1, 0};
-    iovec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
+    psa_invec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};
-    iovec_t resp = { response_buf, CLIENT_RSP_BUF_SIZE };
+    psa_outvec_t resp = { response_buf, CLIENT_RSP_BUF_SIZE };
 
     negative_server_ipc_tests_call(handle, iovec_temp, PSA_MAX_INVEC_LEN, &resp, 1);
 
@@ -200,10 +200,10 @@ void server_write_null_handle()
     handle = negative_server_ipc_tests_connect(PART2_WRITE_NULL_HANDLE, MINOR_VER);
 
     uint8_t data[2] = {1, 0};
-    iovec iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
+    psa_invec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};
-    iovec_t resp = { response_buf, CLIENT_RSP_BUF_SIZE };
+    psa_outvec_t resp = { response_buf, CLIENT_RSP_BUF_SIZE };
 
     negative_server_ipc_tests_call(handle, iovec_temp, PSA_MAX_INVEC_LEN, &resp, 1);
 

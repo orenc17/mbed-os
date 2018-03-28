@@ -493,9 +493,9 @@ PSA_TEST_SERVER(cross_partition_call)
     memcpy(buff + str_len, buff, str_len);
     data_read *= 2;
 
-    iovec_t data = { buff, data_read };
+    psa_invec_t data = { buff, data_read };
 
-    iovec_t resp = { buff, data_read };
+    psa_outvec_t resp = { buff, data_read };
     psa_handle_t conn_handle = psa_connect(SF_REVERSE, 5);
     if (conn_handle <= 0) {
         partition_call_status = PSA_GENERIC_ERROR;

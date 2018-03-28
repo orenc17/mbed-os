@@ -62,14 +62,14 @@ static psa_handle_t negative_client_ipc_tests_connect(uint32_t sfid, uint32_t mi
 }
 
 static void negative_client_ipc_tests_call( psa_handle_t handle,
-                                   iovec_t *iovec_temp,
+                                   psa_invec_t *iovec_temp,
                                    size_t tx_len,
                                    size_t rx_len
                                  )
 {
     error_t status = PSA_SUCCESS;
     memset(response_buf, 0, sizeof(response_buf));
-    iovec_t resp = { response_buf, rx_len };
+    psa_outvec_t resp = { response_buf, rx_len };
 
     status = psa_call(handle, iovec_temp, tx_len, &resp, 1);
 
@@ -123,7 +123,7 @@ void client_call_invalid_tx_len()
 
     uint8_t data[2] = {1, 0};
 
-    iovec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
+    psa_invec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};
 
@@ -137,7 +137,7 @@ void client_call_rx_buff_null_rx_len_not_zero()
 {
     psa_handle_t handle = 0;
     uint8_t data[2] = {1, 0};
-    iovec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
+    psa_invec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};
 
@@ -155,7 +155,7 @@ void client_call_iovecs_null_tx_len_not_zero()
 
     handle = negative_client_ipc_tests_connect(PART1_SF1, MINOR_VER);
     memset(response_buf, 0, CLIENT_RSP_BUF_SIZE);
-    iovec_t resp = { response_buf, CLIENT_RSP_BUF_SIZE };
+    psa_outvec_t resp = { response_buf, CLIENT_RSP_BUF_SIZE };
 
     psa_call(handle, NULL, PSA_MAX_INVEC_LEN, &resp, 1);
 
@@ -169,7 +169,7 @@ void client_call_iovec_base_null_len_not_zero()
 
     uint8_t data[2] = {1, 0};
 
-    iovec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{NULL, sizeof(data)},
+    psa_invec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{NULL, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};
 
@@ -188,7 +188,7 @@ void client_call_invalid_handle()
 
     uint8_t data[2] = {1, 0};
 
-    iovec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
+    psa_invec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};
 
@@ -204,7 +204,7 @@ void client_call_handle_is_null()
 
     uint8_t data[2] = {1, 0};
 
-    iovec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
+    psa_invec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};
 
@@ -223,7 +223,7 @@ void client_close_invalid_handle()
 
     uint8_t data[2] = {1, 0};
 
-    iovec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
+    psa_invec_t iovec_temp[PSA_MAX_INVEC_LEN] = {{data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};
 
@@ -237,7 +237,7 @@ void client_close_invalid_handle()
 void client_call_buffer_wrap_around()
 {
     psa_handle_t handle = 0;
-    iovec_t iovec_temp = { (void*)0x80000000, UINT32_MAX };
+    psa_invec_t iovec_temp = { (void*)0x80000000, UINT32_MAX };
 
     handle = negative_client_ipc_tests_connect(PART1_SF1, MINOR_VER);
     psa_call(handle, &iovec_temp, 1, NULL, 0);
@@ -256,7 +256,7 @@ void client_call_excese_outvec()
 {
     psa_handle_t handle = 0;
     uint8_t data[2] = {1, 0};
-    iovec_t iovec_temp[PSA_MAX_OUTVEC_LEN + 1] = {{data, sizeof(data)},
+    psa_outvec_t iovec_temp[PSA_MAX_OUTVEC_LEN + 1] = {{data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)},
                                            {data, sizeof(data)}};

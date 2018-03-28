@@ -170,9 +170,9 @@ psa_handle_t psa_connect(uint32_t sfid, uint32_t minor_version)
 
 psa_error_t psa_call(
     psa_handle_t handle,
-    const iovec_t *in_vec,
+    const psa_invec_t *in_vec,
     size_t in_len,
-    const iovec_t *out_vec,
+    const psa_outvec_t *out_vec,
     size_t out_len
     )
 {
@@ -181,16 +181,16 @@ psa_error_t psa_call(
             SPM_PANIC("in_len (%d) is bigger than allowed (%d)\n", in_len, PSA_MAX_INVEC_LEN);
         }
 
-        if (!is_buffer_accessible(in_vec, in_len * sizeof(iovec_t))) {
+        if (!is_buffer_accessible(in_vec, in_len * sizeof(psa_invec_t))) {
             SPM_PANIC("in_vec is inaccessible\n");
         }
 
         for (uint32_t i = 0; i < in_len; ++i) {
-            if (in_vec[i].iov_len == 0) {
+            if (in_vec[i].len == 0) {
                 continue;
             }
 
-            if (!is_buffer_accessible(in_vec[i].iov_base, in_vec[i].iov_len)) {
+            if (!is_buffer_accessible(in_vec[i].base, in_vec[i].len)) {
                 SPM_PANIC("in_vec[%d] is inaccessible\n", i);
             }
         }
@@ -201,16 +201,16 @@ psa_error_t psa_call(
             SPM_PANIC("out_len (%d) is bigger than allowed (%d)\n", out_len, PSA_MAX_OUTVEC_LEN);
         }
 
-        if (!is_buffer_accessible(out_vec, out_len * sizeof(iovec_t))) {
+        if (!is_buffer_accessible(out_vec, out_len * sizeof(psa_outvec_t))) {
             SPM_PANIC("out_vec is inaccessible\n");
         }
 
         for (uint32_t i = 0; i < out_len; ++i) {
-            if (out_vec[i].iov_len == 0) {
+            if (out_vec[i].len == 0) {
                 continue;
             }
 
-            if (!is_buffer_accessible(out_vec[i].iov_base, out_vec[i].iov_len)) {
+            if (!is_buffer_accessible(out_vec[i].base, out_vec[i].len)) {
                 SPM_PANIC("out_vec[%d] is inaccessible\n", i);
             }
         }

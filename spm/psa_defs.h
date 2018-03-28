@@ -41,8 +41,8 @@ extern "C" {
 
 #define PSA_NULL_HANDLE ((psa_handle_t)0)   /**< Denotes an invalid handle.*/
 
-#define PSA_MAX_INVEC_LEN (3UL) /**< Maximum number of iovec_t structures allowed for psa_call().*/
-#define PSA_MAX_OUTVEC_LEN (3UL) /**< Maximum number of iovec_t structures allowed for psa_write().*/
+#define PSA_MAX_INVEC_LEN (3UL) /**< Maximum number of psa_invec_t structures allowed for psa_call().*/
+#define PSA_MAX_OUTVEC_LEN (3UL) /**< Maximum number of psa_outvec_t structures allowed for psa_write().*/
 
 #define PSA_WAIT_POLL (0UL) /**< Returns immediately even if none of the requested signals is asserted.*/
 #define PSA_WAIT_BLOCK UINT32_MAX /**< Block the caller until one of the requested signals is asserted.*/
@@ -105,10 +105,18 @@ typedef struct psa_msg {
 /**
  * Structure which describes a scatter-gather IO buffer.
  */
-typedef struct iovec {
-    void *iov_base;   /**< Starting address of the buffer.*/
-    size_t iov_len;   /**< Length in bytes of the buffer.*/
-} iovec_t;
+typedef struct psa_invec {
+    const void *base;   /**< Starting address of the buffer.*/
+    size_t len;         /**< Length in bytes of the buffer.*/
+} psa_invec_t;
+
+/**
+ * Structure which describes a scatter-gather IO buffer.
+ */
+typedef struct psa_outvec {
+    void *base;      /**< Starting address of the buffer.*/
+    size_t len;      /**< Length in bytes of the buffer.*/
+} psa_outvec_t;
 
 #ifdef __cplusplus
 }
