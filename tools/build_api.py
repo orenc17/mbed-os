@@ -578,7 +578,7 @@ def build_project(src_paths, build_path, target, toolchain_name,
 
         # Skip SPM sources for Mbed OS 2 builds
         # Directories scanned would not include the root of Mbed OS for legacy builds
-        if 'rtos' in toolchain.config.lib_config_data:
+        if 'spm' in toolchain.config.lib_config_data and toolchain.config.lib_config_data['spm']['config']['enable']:
             # Generate SPM additional code from manifests
             psa_files_dir = generate_spm_data(resources.psa_manifests, build_path)
             resources.add(toolchain.scan_resources(psa_files_dir))
