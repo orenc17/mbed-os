@@ -11,7 +11,7 @@ env:
       "state": "$0",
       "description": "$1",
       "context": "travis-ci/$NAME",
-      "target_url": "https://travis-ci.org/$TRAVIS_REPO_SLUG/jobs/$TRAVIS_JOB_ID"
+      "target_url": "https://travis-ci.com/$TRAVIS_REPO_SLUG/jobs/$TRAVIS_JOB_ID"
       }\nDATA'
 
 cache:
