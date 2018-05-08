@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import fnmatch
 import glob
 import itertools
 import json
@@ -10,6 +11,15 @@ from jsonschema import validate
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = path_join(SCRIPT_DIR, 'templates')
+MANIFEST_TEMPLATES = filter(
+    lambda filename: '_NAME_' in filename,
+    glob.glob(path_join(TEMPLATES_DIR, '*.tpl'))
+)
+COMMON_TEMPLATES = filter(
+    lambda filename: '_NAME_' not in filename,
+    glob.glob(path_join(TEMPLATES_DIR, '*.tpl'))
+)
+MANIFEST_FILE_PATTERN = '*_psa.json'
 
 
 def assert_int(num):
@@ -271,7 +281,7 @@ class Manifest(object):
         )
 
     @classmethod
-    def from_json(cls, manifest_file):
+    def from_json(cls, manifest_file, skip_src=False):
         """
         Load a partition manifest file
 
@@ -294,9 +304,10 @@ class Manifest(object):
         manifest_dir = os.path.dirname(manifest_file)
 
         source_files = []
-        for src_file in manifest['source_files']:
-            source_files.append(
-                os.path.normpath(path_join(manifest_dir, src_file)))
+        if not skip_src:
+            for src_file in manifest['source_files']:
+                source_files.append(
+                    os.path.normpath(path_join(manifest_dir, src_file)))
 
         mmio_regions = []
         for mmio_region in manifest.get('mmio_regions', []):
@@ -356,11 +367,11 @@ class Manifest(object):
 
     def find_dependencies(self, manifests):
         """
-        Find other manifests which holds Secure functions that 
+        Find other manifests which holds Secure functions that
         are declared as extern in this manifest
 
         :param manifests: list of manifests to filter
-        :return: list of manifest's names that holds current 
+        :return: list of manifest's names that holds current
                 extern secure functions
         """
 
@@ -610,11 +621,6 @@ def generate_partitions_sources(manifest_files, extra_filters=None):
     :return: List of paths to the generated files
     """
 
-    partition_template_files = filter(
-        lambda filename: '_NAME_' in filename,
-        glob.glob(path_join(TEMPLATES_DIR, '*.tpl'))
-    )
-
     # Construct a list of all the manifests and sfids.
     manifests = []
     for manifest_file in manifest_files:
@@ -627,13 +633,13 @@ def generate_partitions_sources(manifest_files, extra_filters=None):
     generated_folders = []
     for manifest in manifests:
         manifest_output_folder = manifest.autogen_folder
-        if not manifest.is_up_to_date(partition_template_files):
+        if not manifest.is_up_to_date(MANIFEST_TEMPLATES):
             render_args = {
                 'partition': manifest,
                 'dependent_partitions': manifest.find_dependencies(manifests)
             }
             manifest_output_folder = generate_source_files(
-                manifest.templates_to_files(partition_template_files,
+                manifest.templates_to_files(MANIFEST_TEMPLATES,
                                             manifest_output_folder),
                 render_args,
                 manifest_output_folder,
@@ -655,27 +661,32 @@ Process all the given manifest files and generate C code from them
     :return: List of paths to the generated files
     """
     autogen_folder = path_join(output_dir, 'psa_autogen')
-    template_files = filter(
-        lambda filename: '_NAME_' not in filename,
-        glob.glob(path_join(TEMPLATES_DIR, '*.tpl'))
-    )
-
     templates_dict = {
         t: path_join(autogen_folder, os.path.basename(os.path.splitext(t)[0]))
-        for t in template_files
+        for t in COMMON_TEMPLATES
     }
 
-    if is_up_to_date(manifest_files, template_files, templates_dict.values()):
-        return autogen_folder
+    complete_source_list = templates_dict.values()
 
     # Construct lists of all the manifests and mmio_regions.
     region_list = []
     manifests = []
     for manifest_file in manifest_files:
         manifest_obj = Manifest.from_json(manifest_file)
+        manifests.append(manifest_obj)
         for region in manifest_obj.mmio_regions:
             region_list.append(region)
-        manifests.append(manifest_obj)
+        complete_source_list.extend(
+            manifest_obj.templates_to_files(
+                MANIFEST_TEMPLATES,
+                manifest_obj.autogen_folder).values()
+        )
+
+    if is_up_to_date(
+            manifest_files,
+            MANIFEST_TEMPLATES + COMMON_TEMPLATES,
+            complete_source_list):
+        return autogen_folder
 
     render_args = {
         'partitions': manifests,
@@ -688,3 +699,18 @@ Process all the given manifest files and generate C code from them
         autogen_folder,
         extra_filters=extra_filters
     )
+
+
+def scan_for_manifests(src_dirs):
+    """
+    Scan a list of directories for PSA manifests.
+    
+    :param src_dirs: List of directories
+    :return: List of PSA manifests
+    """
+    manifests = set()
+    for src_dir in src_dirs:
+        for root, dirnames, filenames in os.walk(src_dir, followlinks=True):
+            for filename in fnmatch.filter(filenames, MANIFEST_FILE_PATTERN):
+                manifests.add(os.path.join(root, filename))
+    return list(manifests)
