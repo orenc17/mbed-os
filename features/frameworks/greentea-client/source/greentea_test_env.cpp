@@ -22,7 +22,9 @@
 #include "greentea-client/test_env.h"
 #include "greentea-client/greentea_serial.h"
 #include "greentea-client/greentea_metrics.h"
-
+#ifdef ENABLE_LIBGCOV_PORT
+#include "libgcov-embedded.h"
+#endif
 
 /**
  *   Generic test suite transport protocol keys
@@ -95,8 +97,12 @@ void _GREENTEA_SETUP_COMMON(const int timeout, const char *host_test_name, char 
  *           This function is blocking.
  */
 extern "C" void GREENTEA_SETUP(const int timeout, const char *host_test_name) {
-    char _value[GREENTEA_UUID_LENGTH] = {0};
-    _GREENTEA_SETUP_COMMON(timeout, host_test_name, _value, GREENTEA_UUID_LENGTH);
+    #ifdef ENABLE_LIBGCOV_PORT
+    on_exit(collect_coverage, NULL);
+    static_init();
+    #endif
+    //char _value[GREENTEA_UUID_LENGTH] = {0};
+    //_GREENTEA_SETUP_COMMON(timeout, host_test_name, _value, GREENTEA_UUID_LENGTH);
 }
 
 /** \brief Handshake with host and send setup data (timeout and host test name). Allows you to preserve sync UUID.
