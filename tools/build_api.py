@@ -459,7 +459,8 @@ def build_project(src_paths, build_path, target, toolchain_name,
                   notify=None, name=None, macros=None, inc_dirs=None, jobs=1,
                   report=None, properties=None, project_id=None,
                   project_description=None, config=None,
-                  app_config=None, build_profile=None, stats_depth=None, ignore=None):
+                  app_config=None, build_profile=None, stats_depth=None, ignore=None,
+                  coverage_patterns=None):
     """ Build a project. A project may be a test or a user program.
 
     Positional arguments:
@@ -534,8 +535,21 @@ def build_project(src_paths, build_path, target, toolchain_name,
         if linker_script is not None:
             resources.add_file_ref(linker_script, linker_script)
 
+        if coverage_patterns:
+            coverage_build_profile = create_coverage_build_profile(build_profile)
+            coverage_toolchain = prepare_toolchain(
+                src_paths, build_path, target, toolchain_name, macros=macros,
+                clean=clean, jobs=jobs, notify=notify, app_config=app_config,
+                build_profile=coverage_build_profile, ignore=ignore)
+            coverage_resources = split_coverage_resources(resources, coverage_patterns)
+
         # Compile Sources
         objects = toolchain.compile_sources(resources, sorted(resources.get_file_paths(FileType.INC_DIR)))
+
+        if coverage_patterns:
+            objects += compile_coverage_sources(resources, toolchain, coverage_resources)
+            toolchain = coverage_toolchain
+            
         resources.add_files_to_type(FileType.OBJECT, objects)
 
         # Link Program

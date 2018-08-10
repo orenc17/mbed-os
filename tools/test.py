@@ -255,7 +255,8 @@ if __name__ == '__main__':
                     app_config=config,
                     build_profile=profile,
                     stats_depth=options.stats_depth,
-                    ignore=options.ignore)
+                    ignore=options.ignore,
+                    coverage_patterns=options.coverage_patterns)
 
                 # If a path to a test spec is provided, write it to a file
                 if options.test_spec:
