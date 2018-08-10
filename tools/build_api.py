@@ -48,6 +48,7 @@ from .targets import TARGET_NAMES, TARGET_MAP, CORE_ARCH
 from .libraries import Library
 from .toolchains import TOOLCHAIN_CLASSES
 from .config import Config
+from .coverage import create_coverage_build_profile, split_coverage_resources, compile_coverage_sources
 
 RELEASE_VERSIONS = ['2', '5']
 
@@ -616,7 +617,7 @@ def build_library(src_paths, build_path, target, toolchain_name,
                   archive=True, notify=None, macros=None, inc_dirs=None, jobs=1,
                   report=None, properties=None, project_id=None,
                   remove_config_header_file=False, app_config=None,
-                  build_profile=None, ignore=None):
+                  build_profile=None, ignore=None, coverage_patterns=None):
     """ Build a library
 
     Positional arguments:
@@ -715,12 +716,24 @@ def build_library(src_paths, build_path, target, toolchain_name,
         )
         toolchain.copy_files(to_copy, build_path)
         # Compile Sources
+        if coverage_patterns:
+            coverage_build_profile = create_coverage_build_profile(build_profile)
+            coverage_toolchain = prepare_toolchain(
+                src_paths, build_path, target, toolchain_name, macros=macros,
+                clean=clean, jobs=jobs, notify=notify, app_config=app_config,
+                build_profile=coverage_build_profile, ignore=ignore)
+            coverage_resources = split_coverage_resources(res, coverage_patterns)
+
         objects = toolchain.compile_sources(
             res, res.get_file_paths(FileType.INC_DIR))
+
+        if coverage_patterns:
+            objects += compile_coverage_sources(res, toolchain, coverage_resources)
+
         res.add_files_to_type(FileType.OBJECT, objects)
 
         if archive:
-            toolchain.build_library(objects, build_path, name)
+            toolchain.build_library(res.objects, build_path, name)
 
         if remove_config_header_file:
             config_header_path = toolchain.get_config_header()

@@ -30,7 +30,7 @@ sys.path.insert(0, ROOT)
 from tools.config import ConfigException, Config
 from tools.test_api import test_path_to_name, find_tests, get_test_config, print_tests, build_tests, test_spec_from_test_builds
 from tools.test_configs import get_default_config
-from tools.options import get_default_options_parser, extract_profile, extract_mcus
+from tools.options import get_default_options_parser, extract_profile, extract_mcus, argparse_profile_filestring_type
 from tools.build_api import build_project, build_library
 from tools.build_api import print_build_memory_usage
 from tools.build_api import merge_build_data
@@ -115,6 +115,9 @@ if __name__ == '__main__':
         parser.add_argument("--ignore", dest="ignore", type=argparse_many(str),
                           default=None, help="Comma separated list of patterns to add to mbedignore (eg. ./main.cpp)")
 
+        parser.add_argument("--coverage", dest="coverage_patterns", type=argparse_many(str),
+                            default=None, help="Coverage patterns to run")
+
         options = parser.parse_args()
 
         # Filter tests by path if specified
@@ -156,7 +159,6 @@ if __name__ == '__main__':
         if not config:
             config = get_default_config(options.source_dir or ['.'], mcu)
 
-
         # Find all tests in the relevant paths
         for path in all_paths:
             all_tests.update(find_tests(path, mcu, toolchain,
@@ -178,7 +180,6 @@ if __name__ == '__main__':
         else:
             tests = all_tests
 
-
         if options.list:
             # Print available tests in order and exit
             print_tests(tests, options.format)
@@ -193,6 +194,12 @@ if __name__ == '__main__':
             # Default base source path is the current directory
             if not base_source_paths:
                 base_source_paths = ['.']
+
+            # Coverage requires debug profile
+            if options.coverage_patterns:
+                if toolchain != u'GCC_ARM':
+                    raise ToolException('Coverage supports only GCC_ARM toolchain')
+                options.profile.append(argparse_profile_filestring_type('debug'))
 
             build_report = {}
             build_properties = {}
@@ -210,7 +217,8 @@ if __name__ == '__main__':
                               notify=notify, archive=False,
                               app_config=config,
                               build_profile=profile,
-                              ignore=options.ignore)
+                              ignore=options.ignore,
+                              coverage_patterns=options.coverage_patterns)
 
                 library_build_success = True
             except ToolException as e:
