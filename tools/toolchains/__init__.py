@@ -86,7 +86,7 @@ class mbedToolchain:
     profile_template = {'common':[], 'c':[], 'cxx':[], 'asm':[], 'ld':[]}
 
     def __init__(self, target, notify=None, macros=None, build_profile=None,
-                 build_dir=None):
+                 build_dir=None, coverage_patterns=None):
         self.target = target
         self.name = self.__class__.__name__
 
@@ -153,6 +153,9 @@ class mbedToolchain:
 
         # Used by the mbed Online Build System to build in chrooted environment
         self.CHROOT = None
+
+        self.coverage_supported = False
+        self.coverage_patterns = coverage_patterns
 
         # Call post __init__() hooks before the ARM/GCC_ARM/IAR toolchain __init__() takes over
         self.init()

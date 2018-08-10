@@ -48,7 +48,6 @@ from .targets import TARGET_NAMES, TARGET_MAP, CORE_ARCH
 from .libraries import Library
 from .toolchains import TOOLCHAIN_CLASSES
 from .config import Config
-from .coverage import create_coverage_build_profile, split_coverage_resources, compile_coverage_sources
 
 RELEASE_VERSIONS = ['2', '5']
 
@@ -287,7 +286,8 @@ def target_supports_toolchain(target, toolchain_name):
 def prepare_toolchain(src_paths, build_dir, target, toolchain_name,
                       macros=None, clean=False, jobs=1,
                       notify=None, config=None, app_config=None,
-                      build_profile=None, ignore=None):
+                      build_profile=None, ignore=None,
+                      coverage_patterns=None):
     """ Prepares resource related objects - toolchain, target, config
 
     Positional arguments:
@@ -331,7 +331,8 @@ def prepare_toolchain(src_paths, build_dir, target, toolchain_name,
             profile[key].extend(contents[toolchain_name].get(key, []))
 
     toolchain = cur_tc(
-        target, notify, macros, build_dir=build_dir, build_profile=profile)
+        target, notify, macros, build_dir=build_dir, build_profile=profile,
+        coverage_patterns=coverage_patterns)
 
     toolchain.config = config
     toolchain.jobs = jobs
@@ -504,7 +505,8 @@ def build_project(src_paths, build_path, target, toolchain_name,
     toolchain = prepare_toolchain(
         src_paths, build_path, target, toolchain_name, macros=macros,
         clean=clean, jobs=jobs, notify=notify, config=config,
-        app_config=app_config, build_profile=build_profile, ignore=ignore)
+        app_config=app_config, build_profile=build_profile, ignore=ignore,
+        coverage_patterns=coverage_patterns)
     toolchain.version_check()
 
     # The first path will give the name to the library
@@ -535,21 +537,9 @@ def build_project(src_paths, build_path, target, toolchain_name,
         if linker_script is not None:
             resources.add_file_ref(linker_script, linker_script)
 
-        if coverage_patterns:
-            coverage_build_profile = create_coverage_build_profile(build_profile)
-            coverage_toolchain = prepare_toolchain(
-                src_paths, build_path, target, toolchain_name, macros=macros,
-                clean=clean, jobs=jobs, notify=notify, app_config=app_config,
-                build_profile=coverage_build_profile, ignore=ignore)
-            coverage_resources = split_coverage_resources(resources, coverage_patterns)
-
         # Compile Sources
         objects = toolchain.compile_sources(resources, sorted(resources.get_file_paths(FileType.INC_DIR)))
 
-        if coverage_patterns:
-            objects += compile_coverage_sources(resources, toolchain, coverage_resources)
-            toolchain = coverage_toolchain
-            
         resources.add_files_to_type(FileType.OBJECT, objects)
 
         # Link Program
@@ -681,7 +671,8 @@ def build_library(src_paths, build_path, target, toolchain_name,
     toolchain = prepare_toolchain(
         src_paths, build_path, target, toolchain_name, macros=macros,
         clean=clean, jobs=jobs, notify=notify, app_config=app_config,
-        build_profile=build_profile, ignore=ignore)
+        build_profile=build_profile, ignore=ignore,
+        coverage_patterns=coverage_patterns)
 
     # The first path will give the name to the library
     if name is None:
@@ -730,19 +721,8 @@ def build_library(src_paths, build_path, target, toolchain_name,
         )
         toolchain.copy_files(to_copy, build_path)
         # Compile Sources
-        if coverage_patterns:
-            coverage_build_profile = create_coverage_build_profile(build_profile)
-            coverage_toolchain = prepare_toolchain(
-                src_paths, build_path, target, toolchain_name, macros=macros,
-                clean=clean, jobs=jobs, notify=notify, app_config=app_config,
-                build_profile=coverage_build_profile, ignore=ignore)
-            coverage_resources = split_coverage_resources(res, coverage_patterns)
-
         objects = toolchain.compile_sources(
             res, res.get_file_paths(FileType.INC_DIR))
-
-        if coverage_patterns:
-            objects += compile_coverage_sources(res, toolchain, coverage_resources)
 
         res.add_files_to_type(FileType.OBJECT, objects)
 

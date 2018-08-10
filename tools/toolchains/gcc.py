@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import re
+import fnmatch
 from os.path import join, basename, splitext, dirname, exists
 from os import getenv
 from distutils.spawn import find_executable
@@ -34,10 +35,14 @@ class GCC(mbedToolchain):
     GCC_RANGE = (LooseVersion("6.0.0"), LooseVersion("7.0.0"))
     GCC_VERSION_RE = re.compile(b"\d+\.\d+\.\d+")
 
+    COMMON_COVERAGE_FLAGS = ["-DENABLE_LIBGCOV_PORT=1", "--coverage"]
+
     def __init__(self, target,  notify=None, macros=None, build_profile=None,
-                 build_dir=None):
+                 build_dir=None, coverage_patterns=None):
         mbedToolchain.__init__(self, target, notify, macros,
-                               build_profile=build_profile, build_dir=build_dir)
+                               build_profile=build_profile,
+                               build_dir=build_dir,
+                               coverage_patterns=coverage_patterns)
 
         tool_path=TOOLCHAIN_PATHS['GCC_ARM']
         # Add flags for current size setting
@@ -103,6 +108,7 @@ class GCC(mbedToolchain):
 
         main_cc = join(tool_path, "arm-none-eabi-gcc")
         main_cppc = join(tool_path, "arm-none-eabi-g++")
+        self.coverage_supported = True
         self.asm = [main_cc] + self.flags['asm'] + self.flags["common"]
         self.cc  = [main_cc]
         self.cppc =[main_cppc]
@@ -119,6 +125,14 @@ class GCC(mbedToolchain):
 
         self.use_distcc = (bool(getenv("DISTCC_POTENTIAL_HOSTS", False))
                            and not getenv("MBED_DISABLE_DISTCC", False))
+
+        self.coverage_cc = self.cc + self.COMMON_COVERAGE_FLAGS
+        self.coverage_cppc = self.cppc + self.COMMON_COVERAGE_FLAGS
+        self.coverage_ld = self.ld + ["--coverage"]
+
+        for flag in ['-Wl,--wrap,exit', '-Wl,--wrap,atexit']:
+            if flag in self.coverage_ld:
+                self.coverage_ld.remove(flag)
 
     def version_check(self):
         stdout, _, retcode = run_cmd([self.cc[0], "--version"], redirect=True)
@@ -189,6 +203,12 @@ class GCC(mbedToolchain):
             opts = opts + self.get_config_option(config_header)
         return opts
 
+    def match_coverage_patterns(self, source):
+        for pattern in self.coverage_patterns:
+            if fnmatch.fnmatch(source, pattern):
+                return True
+        return False
+
     @hook_tool
     def assemble(self, source, object, includes):
         # Build assemble command
@@ -217,9 +237,13 @@ class GCC(mbedToolchain):
         return [cmd]
 
     def compile_c(self, source, object, includes):
+        if self.coverage_patterns and self.match_coverage_patterns(source):
+            return self.compile(self.coverage_cc, source, object, includes)
         return self.compile(self.cc, source, object, includes)
 
     def compile_cpp(self, source, object, includes):
+        if self.coverage_patterns and self.match_coverage_patterns(source):
+            return self.compile(self.coverage_cppc, source, object, includes)
         return self.compile(self.cppc, source, object, includes)
 
     @hook_tool
@@ -241,7 +265,12 @@ class GCC(mbedToolchain):
 
         # Build linker command
         map_file = splitext(output)[0] + ".map"
-        cmd = self.ld + ["-o", output, "-Wl,-Map=%s" % map_file] + objects + ["-Wl,--start-group"] + libs + ["-Wl,--end-group"]
+        if self.coverage_patterns:
+            cmd = self.coverage_ld
+        else:
+            cmd = self.ld
+
+        cmd += ["-o", output, "-Wl,-Map=%s" % map_file] + objects + ["-Wl,--start-group"] + libs + ["-Wl,--end-group"]
 
         if mem_map:
             cmd.extend(['-T', mem_map])
