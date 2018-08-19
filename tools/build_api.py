@@ -320,6 +320,8 @@ def prepare_toolchain(src_paths, build_dir, target, toolchain_name,
     if (toolchain_name == "ARM" and CORE_ARCH[target.core] == 8):
         toolchain_name = "ARMC6"
 
+    if coverage_patterns:
+        target.extra_labels.append(u'COVERAGE')
     try:
         cur_tc = TOOLCHAIN_CLASSES[toolchain_name]
     except KeyError:
