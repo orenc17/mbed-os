@@ -4688,6 +4688,7 @@
     },
     "FUTURE_SEQUANA_M0_PSA": {
         "inherits": ["SPE_Target", "FUTURE_SEQUANA_M0"],
+        "device_has_add": ["TRNG"],
         "components_add": ["SPM_MAILBOX"],
         "macros_add": ["PSOC6_DYNSRM_DISABLE=1", "PU_ENABLE"],
         "deliver_to_target": "FUTURE_SEQUANA_PSA",
@@ -4706,6 +4707,7 @@
     },
     "FUTURE_SEQUANA_PSA": {
         "inherits": ["NSPE_Target", "FUTURE_SEQUANA"],
+        "device_has_add": ["TRNG"],
         "sub_target": "FUTURE_SEQUANA_M0_PSA",
         "extra_labels_remove": ["CORDIO"],
         "components_add": ["SPM_MAILBOX"],
