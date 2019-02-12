@@ -107,7 +107,13 @@ psa_status_t psa_its_remove_impl(int32_t pid, psa_storage_uid_t uid)
 psa_status_t psa_its_reset_impl()
 {
     if (!kvstore) {
-        its_init();
+        KVMap &kv_map = KVMap::get_instance();
+        kvstore = kv_map.get_internal_kv_instance(STR_EXPAND(MBED_CONF_STORAGE_DEFAULT_KV));
+        if (!kvstore) {
+        // Can only happen due to system misconfiguration.
+        // Thus considered as unrecoverable error for runtime.
+            error("Failed getting kvstore instance\n");
+        }
     }
 
     return psa_storage_reset_impl(kvstore);
